@@ -1,0 +1,3 @@
+﻿  testing.cpp
+C:\Users\clove\source\repos\testing\testing.cpp(43,19): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  testing.vcxproj -> C:\Users\clove\source\repos\testing\x64\Debug\testing.exe
