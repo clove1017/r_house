@@ -17,12 +17,12 @@ private:
         char suit = card[0];
         return suit;
     }
-    string card_val(string card) {
+    int card_val(string card) {
         string val;
         val = card;
         val.erase(0, 1); //remove first char
         if (val == "A") {
-            val = "14";
+            val = 14;
         }
         else if (val == "K") {
             val= "13";
@@ -33,7 +33,8 @@ private:
         else if (val == "J") {
             val = "11";
         }
-        return val;
+        int val2=stoi(val);
+        return val2;
     }
 public:
     Table_Settings() {
@@ -62,7 +63,7 @@ public:
     int* Judge(string player_hand[2], string table_cards[5]) {
         int hand_value[3];
         //int highest_hand[4] = { -1, -1, -1, -1 };
-        string card_values[7];
+        int card_values[7];
         char card_suits[7];
         for (int i = 0; i < 5; i++) {
             card_suits[i] = card_suit(table_cards[i]);
@@ -77,6 +78,24 @@ public:
         card_suits[6] = card_suit(player_hand[1]);
         card_values[5] = card_val(player_hand[0]);
         card_values[6] = card_val(player_hand[1]);
+        int holder_arr[7]= {0,0,0,0,0,0,0};
+        char suit_holder_arr[7];
+        //sort the values and suits
+        for (int i = 0; i < 7; i++) {
+            for (int x = 1; x < 7; x++) {
+                if (card_values[i] <= holder_arr[x]) {
+                    for (int l = 0; l < x-1; l++) {
+                        holder_arr[l] = holder_arr[l + 1];
+                    }
+                    holder_arr[x-1] = card_values[i];
+                    suit_holder_arr[x - 1] = card_suits[i];
+                    break;
+                }
+            }
+        }
+        memcpy(card_values, holder_arr, sizeof(card_values));
+        memcpy(card_suits, suit_holder_arr, sizeof(card_suits));
+
         //suits and values unpacked, begin hand evaluation
         // 
         //evaluate number of each suit:
@@ -112,19 +131,19 @@ public:
                 }
             }
         }
+        int flush_card_vals[7] = { 0, 0, 0, 0, 0, 0, 0 };
         if (flush_suit != 'x') {
             //get high values of flush
-            int flush_card_vals[7] = {0, 0, 0, 0, 0, 0, 0};
             for (int m = 0; m < 7; m++) {
                 if (card_suits[m] == flush_suit) {
                     int z = -1;
-                    while ((stoi(card_values[m])) > flush_card_vals[z+1] and z<6) {
+                    while (((card_values[m])) > flush_card_vals[z+1] and z<6) {
                         z++;
                     }
                     for (int n = 1; n < z + 1; n++) {
                         flush_card_vals[n - 1] = flush_card_vals[n];
                     }
-                    flush_card_vals[z] = stoi(card_values[m]);
+                    flush_card_vals[z] = (card_values[m]);
                 }
             }
             bool one = false;
@@ -168,7 +187,7 @@ public:
         int all_card_vals[14];
         memset(all_card_vals, 0, 14);
         for (int x = 0; x < 7; x++) {
-            all_card_vals[stoi(card_values[x])]++;
+            all_card_vals[(card_values[x])]++;
         }
         int pair_vals[2] = { 0,0 };
         int three_of_kind_val = 0;
@@ -218,28 +237,66 @@ public:
         //begin straight check (assume card_values have been ordered)
         int counter;
         bool one = false;
-        if (card_values[6] == 14) {
+        int straight_vals[5] = { 0,0,0,0,0 };
+        if ((card_values[6]) == 14) {
             bool one = true;
         }
         for (int k = 0; k < 3; k++) {
             counter = 1;
-            if (one and card_values[k] == 2) {
+            if (one and (card_values[k]) == 2) {
+                straight_vals[counter-1] = 1;
                 counter++;
             }
             for (int j = k; j < 6; j++) {
-                if (card_values[j] + 1 == card_values[j + 1]) {
+                straight_vals[counter - 1] = (card_values[j]);
+                if ((card_values[j]) + 1 == (card_values[j + 1])) {
                     counter++;
+                    straight_vals[counter - 1] = (card_values[j + 1]);
                 }
                 else {
                     break;
                 }
             }
         }
-        if (counter >= 5) {
+        if (straight_vals[4]!=0) {
             hand_value[0] = 4;
         }
 
-        //remember to evaluate hand_value[1] and [2]
+        //evaluate hand_value[1] and [2]
+        if (hand_value[0] == 9 or hand_value[0]==5) {
+            hand_value[1] = flush_card_vals[6];
+            hand_value[2] = flush_card_vals[5];
+        }
+        else if (hand_value[0] == 8 or hand_value[0] == 4) {
+            hand_value[1] = straight_vals[4];
+            hand_value[2] = straight_vals[3];
+        }
+        else if (hand_value[0] == 7) {
+            hand_value[1] = four_of_kind_val;
+            hand_value[2] = (card_values[6]);
+        }
+        else if (hand_value[0] == 6) {
+            hand_value[1] = three_of_kind_val;
+            hand_value[2] = pair_vals[0];
+        }
+        else if (hand_value[0] == 3) {
+            hand_value[1] = three_of_kind_val;
+            hand_value[2] = (card_values[6]);
+        }
+        else if (hand_value[0] == 2) {
+            hand_value[1] = pair_vals[0];
+            hand_value[1] = pair_vals[1];
+        }
+        else if (hand_value[0] == 1) {
+            hand_value[1] = pair_vals[0];
+            hand_value[2] = (card_values[6]);
+        }
+        else {
+            hand_value[0] = 0;
+            hand_value[1] = (card_values[6]);
+            hand_value[2] = (card_values[5]);
+        }
+
         return hand_value;
     }
 };
@@ -311,7 +368,7 @@ int main()
         }
     }
     for (int i = 0; i < table.num_players; i++) {
-        cout << player_hands[i][0] + string(" ")+ player_hands[i][1] + "\n";
+        cout << player_hands[i][0] + string(" ") + player_hands[i][1] + "\n";
     }
 
     //deal table cards
@@ -333,9 +390,12 @@ int main()
     string first_hand[2];
     first_hand[0] = player_hands[0][0];
     first_hand[1] = player_hands[0][1];
-    table.Judge(first_hand, table_cards);
+    int* first_hand_val;
+    first_hand_val = table.Judge(first_hand, table_cards);
+    for (int i = 0; i < 3; i++) {
+        cout << first_hand_val[i]<<" ";
+    }
 }
-
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu
 

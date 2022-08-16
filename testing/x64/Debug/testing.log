@@ -1,4 +1,4 @@
 ﻿  testing.cpp
-C:\Users\clove\source\repos\testing\testing.cpp(63,19): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\clove\source\repos\testing\testing.cpp(53): warning C4172: returning address of local variable or temporary: highest_hand
-  testing.vcxproj -> C:\Users\clove\source\repos\testing\x64\Debug\testing.exe
+C:\Users\clove\Desktop\r_house\testing\testing.cpp(310,19): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\clove\Desktop\r_house\testing\testing.cpp(300): warning C4172: returning address of local variable or temporary: hand_value
+  testing.vcxproj -> C:\Users\clove\Desktop\r_house\testing\x64\Debug\testing.exe
